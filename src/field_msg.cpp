@@ -2,6 +2,7 @@
 #include<random>
 #include<stdexcept>
 #include<sstream>
+#include<bitset>
 
 FieldMessage::FieldMessage() 
 : msg_bitmap(0b11) 
@@ -23,6 +24,8 @@ int FieldMessage::calc_el_size(int index) const {
     }else if(type & type_str){
             return 3 + msg.str.size();
     }
+
+    return 0;
 }
 
 void FieldMessage::change_msg_size(int size) {
@@ -42,6 +45,14 @@ void FieldMessage::recalc_size() {
     change_msg_size(sum);
 }
 
+void FieldMessage::delete_all() {
+    for(int i=2;i<get_index(Fields::field_cnt);i++)
+    {
+        auto& msg = msgs[i];
+        if(msg.is_active) DeleteField(msg.__fld);
+    }
+}
+
 uint64_t FieldMessage::cast(Fields fld) const {
     return static_cast<uint64_t>(fld);
 }
@@ -55,7 +66,7 @@ uint64_t FieldMessage::get_index(Fields fld) const {
 }
 
 bool FieldMessage::can_modify(Fields fld) const {
-    return !(cast(fld) & mod_const); 
+    return !(cast(fld) & mod_const) || fld == Fields::field_cnt; 
 }
 
 void FieldMessage::set_msg_bmp_bit(int pos, bool val) {
@@ -124,10 +135,8 @@ std::string FieldMessage::to_string() {
     std::stringstream ss;
     recalc_size();
     uint64_t msg_size = GetInt(Fields::message_size);
-    unsigned char _int = 127;
-    unsigned char _str = 0;
     ss.write(reinterpret_cast<const char*>(&msg_size), sizeof(uint64_t)); // message size
-    ss.write(reinterpret_cast<const char*>(&msg_bitmap), sizeof(uint64_t)); // reserving space for bitmask
+    ss.write(reinterpret_cast<const char*>(&msg_bitmap), sizeof(uint64_t)); // bitmask
 
     for(int i=1;i<get_index(Fields::field_cnt);i++)
     {
@@ -135,10 +144,10 @@ std::string FieldMessage::to_string() {
         if(!msg.is_active) continue;
         auto type = get_def_type(msg.__fld);
         if(type & type_int){
-            ss.write(reinterpret_cast<const char*>(&_int), sizeof(unsigned char));
+            ss.write(reinterpret_cast<const char*>(&msg_int), sizeof(unsigned char));
             ss.write(reinterpret_cast<const char*>(&msg.i), sizeof(int32_t));
         }else if(type & type_str){
-            ss.write(reinterpret_cast<const char*>(&_str), sizeof(unsigned char));
+            ss.write(reinterpret_cast<const char*>(&msg_str), sizeof(unsigned char));
             uint16_t temp_size = msg.str.size();
             ss.write(reinterpret_cast<const char*>(&temp_size), sizeof(uint16_t));
             ss.write(reinterpret_cast<const char*>(msg.str.begin().base()), temp_size);
@@ -148,6 +157,6 @@ std::string FieldMessage::to_string() {
     return ss.str();
 }
 
-void FieldMessage::from_string(const std::string & str) {
-    
+void FieldMessage::from_string(const std::string & str) { // im done
+
 }
