@@ -26,15 +26,26 @@ public:
     void SetStringField(Fields, std::string);
     void SetIntField(Fields, int);
     void DeleteField(Fields);
-    std::string to_string() const;
+    std::string to_string();
     void from_string(const std::string &);
     bool Has(Fields) const;
     int GetInt(Fields) const;
     std::string GetString(Fields) const;
 private:
-    uint64_t getRow(uint64_t) const;
     uint64_t cast(Fields) const;
+    uint64_t get_def_type(Fields) const;
+    uint64_t get_index(Fields) const;
+    bool can_modify(Fields) const;
+    void set_msg_bmp_bit(int, bool);
+    void recalc_size();
+    void change_msg_size(int);
+    int calc_el_size(int) const;
 
     uint64_t msg_bitmap;
-    struct{std::string str; int32_t i;bool is_active;} msgs[static_cast<int64_t>(Fields::field_cnt)];
+    struct msg_type{
+        Fields __fld;
+        std::string str;
+        int32_t i;
+        bool is_active = false;
+        } msgs[static_cast<int64_t>(Fields::field_cnt)];
 };
