@@ -5,26 +5,22 @@
 
 class FieldMessage
 {
+private:
+    static const uint64_t type_int = static_cast<int64_t>(1)<<63;
+    static const uint64_t type_str = type_int>>1;
+    static const uint64_t mod_const = type_str>>1;
+    static const uint64_t flush_additional = ~(type_int | type_str | mod_const);
 public:
     enum class Fields : uint64_t
     {
-        message_size,
-        corrId,
-        msg_to_player,
-        name_of_main_block,
-        enemy_count,
-        bullet_speed,
-        field_cnt
+        message_size =          0 | type_int | mod_const,
+        corrId =                1 | type_int | mod_const,
+        msg_to_player =         2 | type_str,
+        name_of_main_block =    3 | type_str,
+        enemy_count =           4 | type_int,
+        bullet_speed =          5 | type_int,
+        field_cnt =             6
     }; 
-    enum class type : unsigned char{string = 0, int32=127};
-    const type types[(uint64_t)Fields::field_cnt] = {
-        type::int32,
-        type::int32,
-        type::string,
-        type::string,
-        type::int32,
-        type::int32,
-        };
 
     FieldMessage();
     void SetStringField(Fields, std::string);
@@ -35,17 +31,10 @@ public:
     bool Has(Fields) const;
     int GetInt(Fields) const;
     std::string GetString(Fields) const;
-
 private:
-    void check_int(Fields) const;
-    void check_str(Fields) const;
-    void recalculate_size();
-    struct msg{
-        std::variant<int32_t,std::string> msg;
-        bool isAlive = false;
-    };
-    msg msgs[(int64_t)Fields::field_cnt];
+    uint64_t getRow(uint64_t) const;
+    uint64_t cast(Fields) const;
 
-    const int type_check_size = 1;
-    const int str_len_size = 2;
+    uint64_t msg_bitmap;
+    struct{std::string str; int32_t i;bool is_active;} msgs[static_cast<int64_t>(Fields::field_cnt)];
 };
