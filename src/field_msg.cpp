@@ -1,6 +1,8 @@
 #include<field_msg.h>
 #include<random>
 #include<stdexcept>
+#include<sstream>
+#include<bitset>
 
 FieldMessage::FieldMessage() 
 : msg_bitmap(0b11),

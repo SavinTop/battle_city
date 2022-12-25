@@ -5,6 +5,13 @@ using std::cout; using std::endl;
 using std::string; using std::hex;
 using std::stringstream;
 
+#include <field_msg.h>
+#include <iostream>
+
+using std::cout; using std::endl;
+using std::string; using std::hex;
+using std::stringstream;
+
 int main(){
   FieldMessage test;
   test.set(FieldMessage::e_fields::enemy_count, 5);
@@ -27,6 +34,7 @@ int main(){
         cout << std::dec << int(item) << " ";
     }
     cout << endl;
+
 
   return 0x0;
 };
