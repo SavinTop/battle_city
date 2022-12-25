@@ -38,8 +38,9 @@ public:
 
 private:
     int cast(e_fields) const;
-    void _throw(const char*);
-    template<bool>
+    void _throw(const char *);
+
+    template <bool>
     void set_bit(int);
 
     bool is_constant(e_fields);
@@ -48,6 +49,7 @@ private:
 
     uint64_t msg_size;
     uint64_t msg_bitmap;
+    static const int def_msg_size = sizeof(uint64_t)+sizeof(uint64_t)+1+sizeof(int32_t);
 
     struct fld_el
     {
