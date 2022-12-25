@@ -1,40 +1,60 @@
 #pragma once
 
-#include <string>
-#include <variant>
+#include "field.h"
 
 class FieldMessage
 {
-private:
-    static const uint64_t type_int = static_cast<int64_t>(1)<<63;
-    static const uint64_t type_str = type_int>>1;
-    static const uint64_t mod_const = type_str>>1;
-    static const uint64_t flush_additional = ~(type_int | type_str | mod_const);
 public:
-    enum class Fields : uint64_t
+    enum class e_fields
     {
-        message_size =          0 | type_int | mod_const,
-        corrId =                1 | type_int | mod_const,
-        msg_to_player =         2 | type_str,
-        name_of_main_block =    3 | type_str,
-        enemy_count =           4 | type_int,
-        bullet_speed =          5 | type_int,
-        field_cnt =             6
-    }; 
+        message_size,
+        corrId,
+        msg_to_player,
+        name_of_main_block,
+        enemy_count,
+        bullet_speed,
+        field_cnt
+    };
+
+    enum class field_type : unsigned char
+    {
+        str = 1 << 0,
+        int32 = 1 << 1,
+    };
 
     FieldMessage();
-    void SetStringField(Fields, std::string);
-    void SetIntField(Fields, int);
-    void DeleteField(Fields);
+    void set(e_fields, const std::string &);
+    void set(e_fields, int);
+    void del(e_fields);
     std::string to_string() const;
     void from_string(const std::string &);
-    bool Has(Fields) const;
-    int GetInt(Fields) const;
-    std::string GetString(Fields) const;
-private:
-    uint64_t getRow(uint64_t) const;
-    uint64_t cast(Fields) const;
+    bool has(e_fields) const;
+    int get_int(e_fields) const;
+    const std::string &get_str(e_fields) const;
 
+private:
+    int cast(e_fields) const;
+
+    template<bool>
+    void set_bit(int);
+
+    bool is_constant(e_fields);
+
+    void throw_on_constant(e_fields);
+
+    uint64_t msg_size;
     uint64_t msg_bitmap;
-    struct{std::string str; int32_t i;bool is_active;} msgs[static_cast<int64_t>(Fields::field_cnt)];
+
+    struct fld_el
+    {
+        std::variant<int32_t, std::string> value;
+        field_type type;
+        bool active;
+        size_t size();
+    };
+
+    fld_el els[static_cast<int>(e_fields::field_cnt)];
+
+    const fld_el &operator[](e_fields) const;
+    fld_el &operator[](e_fields);
 };
