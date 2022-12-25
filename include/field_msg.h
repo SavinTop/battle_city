@@ -1,6 +1,9 @@
 #pragma once
 
-#include "field.h"
+#include <variant>
+#include <string>
+#include <sstream>
+#include <algorithm>
 
 class FieldMessage
 {
@@ -23,6 +26,7 @@ public:
     };
 
     FieldMessage();
+
     void set(e_fields, const std::string &);
     void set(e_fields, int);
     void del(e_fields);
@@ -34,7 +38,7 @@ public:
 
 private:
     int cast(e_fields) const;
-
+    void _throw(const char*);
     template<bool>
     void set_bit(int);
 
