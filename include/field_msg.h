@@ -59,7 +59,7 @@ private:
         size_t size();
     };
 
-    fld_el els[static_cast<int>(e_fields::field_cnt)];
+    fld_el els[static_cast<int>(e_fields::field_cnt)+1];
 
     const fld_el &operator[](e_fields) const;
     fld_el &operator[](e_fields);

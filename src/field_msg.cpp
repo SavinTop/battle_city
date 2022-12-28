@@ -18,6 +18,7 @@ FieldMessage::FieldMessage()
     (*this)[e_fields::name_of_main_block] = {"", field_type::str, false};
     (*this)[e_fields::enemy_count] = {0, field_type::int32, false};
     (*this)[e_fields::bullet_speed] = {0, field_type::int32, false};
+    (*this)[e_fields::field_cnt] = {cast(e_fields::field_cnt), field_type::int32, true};
 }
 
 const FieldMessage::fld_el &FieldMessage::operator[](e_fields fld) const
@@ -179,6 +180,8 @@ void FieldMessage::from_string(const std::string &s)
             _throw("the bitmap field gives the wrong data");
         auto &curr = new_msg.els[i];
         auto &exp_type = curr.type;
+        if (s.size() - ss.tellp() - 1 < sizeof(unsigned char))
+                _throw("there is not enough space in the buffer to read type");
         unsigned char type;
         ss.read(reinterpret_cast<char *>(&type), sizeof(unsigned char));
 
