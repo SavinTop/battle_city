@@ -5,6 +5,7 @@
 #include <bitset>
 #include <ctime>
 
+
 FieldMessage::FieldMessage()
     : msg_bitmap(0b11),
       msg_size(def_msg_size) // default size 8 message_size 8 bitmask and 5 for corrId
