@@ -7,26 +7,19 @@ using std::hex;
 using std::string;
 using std::stringstream;
 
-#include <field_msg.h>
-#include <iostream>
-
-using std::cout;
-using std::endl;
-using std::hex;
-using std::string;
-using std::stringstream;
+using msg::Message;
 
 int main()
 {
-  FieldMessage test;
-  test.set(FieldMessage::e_fields::enemy_count, 5);
-  test.set(FieldMessage::e_fields::msg_to_player, "hello from message out there heeey youu");
-  auto s1 = test.to_string();
+  Message test;
+  test.set(Message::e_fields::enemy_count, 5);
+  test.set(Message::e_fields::msg_to_player, "hello from message out there heeey youu");
+  auto s1 = msg::ser::to_string(test);
 
-  FieldMessage test2;
+  Message test2;
 
-  test2.from_string(s1);
-  s1 = test2.to_string();
+  test2 = msg::ser::from_string(s1);
+  s1 = msg::ser::to_string(test2);
   cout << "string: " << s1 << endl;
   cout << "hexval: ";
   for (const auto &item : s1)

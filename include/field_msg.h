@@ -4,8 +4,11 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
+#include "msg_ser.h"
 
-class FieldMessage
+namespace msg{
+
+class Message
 {
 public:
     enum class e_fields
@@ -25,27 +28,23 @@ public:
         int32 = 1 << 1,
     };
 
-    FieldMessage();
+    Message();
 
     void set(e_fields, const std::string &);
     void set(e_fields, int);
     void del(e_fields);
-    std::string to_string() const;
-    void from_string(const std::string &);
     bool has(e_fields) const;
     int get_int(e_fields) const;
     const std::string &get_str(e_fields) const;
 
 private:
-    int cast(e_fields) const;
-    void _throw(const char *);
+    static int cast(e_fields);
+    static void _throw(const char *);
+    static bool is_constant(e_fields);
+    static void throw_on_constant(e_fields);
 
     template <bool>
     void set_bit(int);
-
-    bool is_constant(e_fields);
-
-    void throw_on_constant(e_fields);
 
     uint64_t msg_size;
     uint64_t msg_bitmap;
@@ -63,4 +62,9 @@ private:
 
     const fld_el &operator[](e_fields) const;
     fld_el &operator[](e_fields);
+
+    friend std::string ser::to_string(const Message&);
+    friend Message ser::from_string(const std::string &);
 };
+
+}
