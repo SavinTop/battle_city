@@ -4,6 +4,7 @@
 #include <bitset>
 #include <ctime>
 #include "field_msg.h"
+#include "msg_exceptions.h"
 
 namespace msg{
 
@@ -38,7 +39,7 @@ bool Message::is_constant(e_fields fld)
 void Message::throw_on_constant(e_fields fld)
 {
     if (is_constant(fld))
-        throw("this value cant be modified");
+        throw immutable_error("this value cant be modified");
 }
 
 size_t Message::fld_el::size()
@@ -53,13 +54,13 @@ void Message::set(e_fields fld, const std::string &val)
 {
     throw_on_constant(fld);
     if (val.size() >= UINT16_MAX)
-        throw("string size cant be more or eq UINT16_MAX");
+        throw length_error("string size cant be more or eq UINT16_MAX");
     auto &curr = list[fld];
     int size_before_assign = curr.size();
     if (curr.type == field_type::str)
         curr.value = val;
     else
-        throw("cant set string for int field");
+        throw type_error("cant set string for int field");
     if (curr.active)
     {
         msg_size -= size_before_assign + 3; // adjust message size value for new size
@@ -76,7 +77,7 @@ void Message::set(e_fields fld, int val)
     if (curr.type == field_type::int32)
         curr.value = val;
     else
-        throw("cant set int for string field");
+        throw type_error("cant set int for string field");
     if (curr.active)
         return;
     curr.active = true;
@@ -108,7 +109,7 @@ int Message::get_int(e_fields fld) const
     const fld_el &curr = list[fld];
     if (curr.type == field_type::int32)
         return std::get<int>(curr.value);
-    throw "expected string, got int request";
+    throw type_error("expected string, got int request");
 }
 
 const std::string &Message::get_str(e_fields fld) const
@@ -116,7 +117,7 @@ const std::string &Message::get_str(e_fields fld) const
     const fld_el &curr = list[fld];
     if (curr.type == field_type::str)
         return std::get<std::string>(curr.value);
-    throw "expected int, got string request";
+    throw type_error("expected int, got string request");
 }
 
 }

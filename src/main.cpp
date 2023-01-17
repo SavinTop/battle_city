@@ -29,9 +29,9 @@ int main()
     }
     cout << endl;
   }
-  catch (const char *err)
+  catch (std::exception& exp)
   {
-    std::cerr << err << '\n';
+    std::cerr << exp.what() << '\n';
   }
 
   return 0x0;
