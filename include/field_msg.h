@@ -4,8 +4,12 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
+#include <serialization.h>
 
-class FieldMessage
+namespace msg
+{
+    
+class Message
 {
 public:
     enum class e_fields
@@ -19,26 +23,17 @@ public:
         field_cnt
     };
 
-    enum class field_type : unsigned char
-    {
-        str = 1 << 0,
-        int32 = 1 << 1,
-    };
-
-    FieldMessage();
+    Message();
 
     void set(e_fields, const std::string &);
     void set(e_fields, int);
     void del(e_fields);
-    std::string to_string() const;
-    void from_string(const std::string &);
     bool has(e_fields) const;
     int get_int(e_fields) const;
     const std::string &get_str(e_fields) const;
 
 private:
-    int cast(e_fields) const;
-    void _throw(const char *);
+    size_t cast(e_fields) const;
 
     template <bool>
     void set_bit(int);
@@ -48,7 +43,8 @@ private:
     void throw_on_constant(e_fields);
 
     uint64_t msg_size;
-    uint64_t msg_bitmap;
+    uint64_t msg_bitset;
+    //msg size, bitset, 1(type) + unique msg id
     static const int def_msg_size = sizeof(uint64_t)+sizeof(uint64_t)+1+sizeof(int32_t);
 
     struct fld_el
@@ -59,8 +55,25 @@ private:
         size_t size();
     };
 
-    fld_el els[static_cast<int>(e_fields::field_cnt)+1];
+    template<size_t SIZE>
+    struct fld_list{
+        template<typename T>
+        const fld_el &operator[](T fld) const{
+            return els[static_cast<size_t>(fld)];
+        }
 
-    const fld_el &operator[](e_fields) const;
-    fld_el &operator[](e_fields);
+        template<typename T>
+        fld_el &operator[](T fld){
+            return els[static_cast<size_t>(fld)];
+        }
+
+        fld_el els[SIZE];
+    };
+
+    fld_list<static_cast<size_t>(e_fields::field_cnt)+1> list;
+
+    friend std::string deser::ser(const Message&);
+    friend Message deser::deser(std::string);
 };
+
+} // namespace msg
