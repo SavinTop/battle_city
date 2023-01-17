@@ -1,3 +1,6 @@
 build
+misc_cygwin
+CMakeFiles
+conan
 .vscode
 .config
