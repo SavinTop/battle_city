@@ -36,13 +36,13 @@ namespace msg
             auto fld_cnt = static_cast<size_t>(Message::e_fields::field_cnt);
 
             write<uint64_t>(ss, m.msg_size);
-            write<uint64_t>(ss, m.msg_bitset);
+            write<uint64_t>(ss, m.msg_bitset.to_ullong());
 
             auto temp_bitmap = m.msg_bitset >> 1;
 
-            for (int i = 1; temp_bitmap && i < fld_cnt; temp_bitmap >>= 1, i++)
+            for (int i = 1; temp_bitmap.any() && i < fld_cnt; temp_bitmap >>= 1, i++)
             {
-                if (!(temp_bitmap & 1))
+                if (!(temp_bitmap.test(0)))
                     continue;
                 auto &curr = m.list[i];
                 if (curr.type == field_type::int32)
@@ -93,9 +93,9 @@ namespace msg
 
             auto temp_bitmap = new_msg.msg_bitset >> 1;
 
-            for (int i = 1; temp_bitmap; temp_bitmap >>= 1, i++)
+            for (int i = 1; temp_bitmap.any(); temp_bitmap >>= 1, i++)
             {
-                if (!(temp_bitmap & 1))
+                if (!(temp_bitmap.test(0)))
                     continue;
                 if (i >= fld_cnt)
                     throw "the bitmap field gives the wrong data";

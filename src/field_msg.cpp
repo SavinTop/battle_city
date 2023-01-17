@@ -23,18 +23,6 @@ Message::Message()
     list[e_fields::field_cnt] = {static_cast<int32_t>(e_fields::field_cnt), field_type::int32, true};
 }
 
-template <>
-void Message::set_bit<false>(int ind)
-{
-    msg_bitset &= ~(static_cast<int64_t>(1) << ind);
-}
-
-template <>
-void Message::set_bit<true>(int ind)
-{
-    msg_bitset |= static_cast<int64_t>(1) << ind;
-}
-
 size_t Message::cast(e_fields fld) const
 {
     return static_cast<int>(fld);
@@ -77,7 +65,7 @@ void Message::set(e_fields fld, const std::string &val)
         msg_size -= size_before_assign + 3; // adjust message size value for new size
     }
     curr.active = true;
-    set_bit<true>(cast(fld));
+    msg_bitset.set(cast(fld),true); 
     msg_size += curr.size() + 3;
 }
 
@@ -92,7 +80,7 @@ void Message::set(e_fields fld, int val)
     if (curr.active)
         return;
     curr.active = true;
-    set_bit<true>(cast(fld));
+    msg_bitset.set(cast(fld),true); 
     msg_size += curr.size() + 1;
 }
 
@@ -103,7 +91,7 @@ void Message::del(e_fields fld)
     if (!curr.active)
         return;
     curr.active = false;
-    set_bit<false>(cast(fld));
+    msg_bitset.set(cast(fld),false); 
     msg_size -= curr.size() + (curr.type == field_type::int32 ? 1 : 3); // reduce msg_size value according to type
 }
 

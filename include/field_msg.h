@@ -5,6 +5,7 @@
 #include <sstream>
 #include <algorithm>
 #include <serialization.h>
+#include <bitset>
 
 namespace msg
 {
@@ -35,15 +36,12 @@ public:
 private:
     size_t cast(e_fields) const;
 
-    template <bool>
-    void set_bit(int);
-
     bool is_constant(e_fields);
 
     void throw_on_constant(e_fields);
 
     uint64_t msg_size;
-    uint64_t msg_bitset;
+    std::bitset<64> msg_bitset;
     //msg size, bitset, 1(type) + unique msg id
     static const int def_msg_size = sizeof(uint64_t)+sizeof(uint64_t)+1+sizeof(int32_t);
 
