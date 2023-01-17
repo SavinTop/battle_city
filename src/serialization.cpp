@@ -36,15 +36,15 @@ namespace msg
             auto fld_cnt = static_cast<size_t>(Message::e_fields::field_cnt);
 
             write<uint64_t>(ss, m.msg_size);
-            write<uint64_t>(ss, m.msg_bitmap);
+            write<uint64_t>(ss, m.msg_bitset);
 
-            auto temp_bitmap = m.msg_bitmap >> 1;
+            auto temp_bitmap = m.msg_bitset >> 1;
 
             for (int i = 1; temp_bitmap && i < fld_cnt; temp_bitmap >>= 1, i++)
             {
                 if (!(temp_bitmap & 1))
                     continue;
-                auto &curr = m.els[i];
+                auto &curr = m.list[i];
                 if (curr.type == field_type::int32)
                     write<int32_t>(ss, std::get<int32_t>(curr.value));
                 else
@@ -86,12 +86,12 @@ namespace msg
             Message new_msg;
 
             new_msg.msg_size = read<uint64_t>(ss);
-            new_msg.msg_bitmap = read<uint64_t>(ss);
+            new_msg.msg_bitset = read<uint64_t>(ss);
 
             if (new_msg.msg_size != str.size())
                 throw "the size of the message is wrong";
 
-            auto temp_bitmap = new_msg.msg_bitmap >> 1;
+            auto temp_bitmap = new_msg.msg_bitset >> 1;
 
             for (int i = 1; temp_bitmap; temp_bitmap >>= 1, i++)
             {
@@ -100,7 +100,7 @@ namespace msg
                 if (i >= fld_cnt)
                     throw "the bitmap field gives the wrong data";
 
-                auto &curr = new_msg.els[i];
+                auto &curr = new_msg.list[i];
                 auto &exp_type = curr.type;
 
                 unsigned char type = read<int8_t>(ss);
