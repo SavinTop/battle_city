@@ -9,6 +9,6 @@ src/main.cpp
 src/field_msg.cpp 
 src/serialization.cpp)
 
-add_executable(battle_city src/main.cpp src/field_msg.cpp src/serialization.cpp)
+add_executable(battle_city ${SRC_LIST})
 
 target_include_directories(battle_city PUBLIC include)
