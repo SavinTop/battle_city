@@ -4,6 +4,8 @@ project(battle_city VERSION 0.2.0)
 
 set (CMAKE_CXX_STANDARD 17)
 
+enable_testing()
+
 include(${CMAKE_SOURCE_DIR}/conan/conanbuildinfo.cmake)
 conan_basic_setup()
 
@@ -19,4 +21,6 @@ target_link_libraries(battle_city PRIVATE message)
 
 add_executable(basic_tests tests/basic_tests.cpp)
 target_link_libraries(basic_tests PRIVATE message ${CONAN_LIBS})
+
+add_test(NAME basic_tests WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin COMMAND basic_tests)
 
