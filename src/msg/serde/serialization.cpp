@@ -38,10 +38,11 @@ namespace msg
 
             write<uint64_t>(ss, m.msg_size);
             write<uint64_t>(ss, m.msg_bitset.to_ullong());
+            write<int32_t>(ss, m.msg_id);
 
-            auto temp_bitmap = m.msg_bitset >> 1;
+            auto temp_bitmap = m.msg_bitset;
 
-            for (int i = 1; temp_bitmap.any() && i < fld_cnt; temp_bitmap >>= 1, i++)
+            for (int i = 0; temp_bitmap.any() && i < fld_cnt; temp_bitmap >>= 1, i++)
             {
                 if (!(temp_bitmap.test(0)))
                     continue;
@@ -88,18 +89,20 @@ namespace msg
 
             new_msg.msg_size = read<uint64_t>(ss);
             new_msg.msg_bitset = read<uint64_t>(ss);
+            read<int8_t>(ss); // the msg id field int32, so by default its have the type, that we dont need
+            new_msg.msg_id = read<int32_t>(ss);
 
             if (new_msg.msg_size != str.size())
                 throw serde_error("the size of the message is wrong");
 
-            auto temp_bitmap = new_msg.msg_bitset >> 1;
+            auto temp_bitmap = new_msg.msg_bitset;
 
-            for (int i = 1; temp_bitmap.any(); temp_bitmap >>= 1, i++)
+            for (int i = 0; temp_bitmap.any(); temp_bitmap >>= 1, i++)
             {
                 if (!(temp_bitmap.test(0)))
                     continue;
                 if (i >= fld_cnt)
-                    throw serde_error("the bitmap field gives the wrong data");
+                    throw serde_error("the bitset field gives the wrong data");
 
                 auto &curr = new_msg.list[i];
 

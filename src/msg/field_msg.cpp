@@ -10,14 +10,12 @@ namespace msg
 {
 
     Message::Message()
-        : msg_bitset(0b11),
+        : msg_bitset(0),
           msg_size(def_msg_size) // default size 8 message_size 8 bitmask and 5 for corrId
     {
         static std::mt19937 mt(std::time(nullptr));
         std::uniform_int_distribution<int32_t> dist(INT32_MIN, INT32_MAX);
-
-        list[e_fields::message_size].assign<int32_t>(0, true);//{0, field_type::int32, true}; // dont use it anyway, msg size variable is more comfortable
-        list[e_fields::corrId].assign<int32_t>(dist(mt), true);//{dist(mt), field_type::int32, true};
+        msg_id = dist(mt);
         list[e_fields::msg_to_player].assign<std::string>();//{"", field_type::str, false};
         list[e_fields::name_of_main_block].assign<std::string>();//{"", field_type::str, false};
         list[e_fields::enemy_count].assign<int32_t>();//{0, field_type::int32, false};
@@ -32,9 +30,7 @@ namespace msg
 
     bool Message::is_constant(e_fields fld)
     {
-        return fld == e_fields::message_size ||
-               fld == e_fields::corrId ||
-               fld == e_fields::field_cnt;
+        return fld == e_fields::field_cnt;
     }
 
     void Message::throw_on_constant(e_fields fld)
@@ -60,24 +56,16 @@ namespace msg
         return curr.is_avaliable();
     }
 
-    template <>
-    std::string Message::get(e_fields fld) const
-    {
-        const auto &curr = list[fld];
-        if (curr.is_type<std::string>())
-            return curr.get<std::string>();
-        throw type_error("expected int, got string request");
+    uint64_t Message::get_msg_bitset() const {
+        return msg_bitset.to_ullong();
     }
 
-    template <>
-    int32_t Message::get(e_fields fld) const
-    {
-        if (fld == e_fields::message_size)
-            return msg_size;
-        const auto &curr = list[fld];
-        if (curr.is_type<int32_t>())
-            return curr.get<int32_t>();
-        throw type_error("expected string, got int request");
+    size_t Message::get_msg_size() const {
+        return msg_size;
+    }
+
+    int32_t Message::get_msg_id() const {
+        return msg_id;
     }
 
 }

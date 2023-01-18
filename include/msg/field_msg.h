@@ -17,8 +17,6 @@ namespace msg
     public:
         enum class e_fields
         {
-            message_size,
-            corrId,
             msg_to_player,
             name_of_main_block,
             enemy_count,
@@ -32,7 +30,13 @@ namespace msg
         bool has(e_fields) const;
 
         template <typename T>
-        T get(e_fields) const;
+        T get(e_fields fld) const
+        {
+            const auto &curr = list[fld];
+            if (curr.is_type<T>())
+                return curr.get<T>();
+            throw type_error("type mismatch on get");
+        }
 
         template <typename T>
         void set(e_fields fld, T val)
@@ -57,6 +61,10 @@ namespace msg
             }
         }
 
+        size_t get_msg_size() const;
+        uint64_t get_msg_bitset() const;
+        int32_t get_msg_id() const;
+
     private:
         static size_t cast(e_fields);
         static bool is_constant(e_fields);
@@ -64,6 +72,7 @@ namespace msg
 
         uint64_t msg_size;
         std::bitset<64> msg_bitset;
+        int32_t msg_id;
         // msg size, bitset, 1(type) + unique msg id
         static const int def_msg_size = sizeof(uint64_t) + sizeof(uint64_t) + 1 + sizeof(int32_t);
 
