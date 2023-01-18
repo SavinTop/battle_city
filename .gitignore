@@ -1,6 +1,7 @@
 build
 misc_cygwin
 CMakeFiles
+Testing
 conan
 .vscode
 .config
