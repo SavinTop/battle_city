@@ -12,7 +12,7 @@ namespace msg
         int32 = 1 << 1,
     };
 
-    namespace deser{
+    namespace serde{
 
         std::string ser(const Message&);
         Message deser(const std::string str);

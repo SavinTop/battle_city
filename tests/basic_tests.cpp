@@ -35,10 +35,10 @@ TEST(Message, SERDE)
     test.set(Message::e_fields::bullet_speed, 2);
     auto msg_size = 8+8+1+4 + (3+sizeof(test_str)-1)*2 + 5 + 5;
     EXPECT_EQ(test.get_int(Message::e_fields::message_size), msg_size);
-    auto str = msg::deser::ser(test);
-    Message test2 = msg::deser::deser(str);
-    auto str1 = msg::deser::ser(test);
-    auto str2 = msg::deser::ser(test2);
+    auto str = msg::serde::ser(test);
+    Message test2 = msg::serde::deser(str);
+    auto str1 = msg::serde::ser(test);
+    auto str2 = msg::serde::ser(test2);
     EXPECT_STREQ(str1.c_str(), str2.c_str());
 }
 

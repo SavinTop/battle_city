@@ -5,7 +5,7 @@
 
 namespace msg
 {
-    namespace deser
+    namespace serde
     {
         template <typename T>
         auto write(std::stringstream &os, T value) -> std::size_t
@@ -61,7 +61,7 @@ namespace msg
             T temp;
             os.read(reinterpret_cast<char *>(&temp), sizeof(T));
             if (!os.good())
-                throw deser_error("error on reading from stream");
+                throw serde_error("error on reading from stream");
             return temp;
         }
 
@@ -72,14 +72,14 @@ namespace msg
             std::string temp(size, 0);
             os.read(temp.begin().base(), size);
             if (!os.good())
-                throw deser_error("error on reading from stream");
+                throw serde_error("error on reading from stream");
             return temp;
         }
 
         Message deser(const std::string str)
         {
             if (str.size() < Message::def_msg_size)
-                throw  deser_error("the size is to small, no requared fields here") ;
+                throw  serde_error("the size is to small, no requared fields here") ;
             auto fld_cnt = static_cast<size_t>(Message::e_fields::field_cnt);
             std::stringstream ss;
             ss << str;
@@ -90,7 +90,7 @@ namespace msg
             new_msg.msg_bitset = read<uint64_t>(ss);
 
             if (new_msg.msg_size != str.size())
-                throw deser_error("the size of the message is wrong");
+                throw serde_error("the size of the message is wrong");
 
             auto temp_bitmap = new_msg.msg_bitset >> 1;
 
@@ -99,7 +99,7 @@ namespace msg
                 if (!(temp_bitmap.test(0)))
                     continue;
                 if (i >= fld_cnt)
-                    throw deser_error("the bitmap field gives the wrong data");
+                    throw serde_error("the bitmap field gives the wrong data");
 
                 auto &curr = new_msg.list[i];
                 auto &exp_type = curr.type;
@@ -107,7 +107,7 @@ namespace msg
                 unsigned char type = read<int8_t>(ss);
 
                 if (static_cast<int8_t>(exp_type) != type)
-                    throw deser_error("the type of the fields do not match");
+                    throw serde_error("the type of the fields do not match");
 
                 if (exp_type == field_type::int32)
                     curr.value = read<int32_t>(ss);

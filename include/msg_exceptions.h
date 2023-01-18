@@ -4,8 +4,8 @@
 
 namespace msg{
 
-namespace deser{
-using deser_error = std::runtime_error;
+namespace serde{
+using serde_error = std::runtime_error;
 }
 
 using type_error = std::runtime_error;

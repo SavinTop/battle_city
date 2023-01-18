@@ -70,8 +70,8 @@ private:
 
     fld_list<static_cast<size_t>(e_fields::field_cnt)+1> list;
 
-    friend std::string deser::ser(const Message&);
-    friend Message deser::deser(std::string);
+    friend std::string serde::ser(const Message&);
+    friend Message serde::deser(std::string);
 };
 
 } // namespace msg
