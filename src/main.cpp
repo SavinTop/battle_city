@@ -13,8 +13,8 @@ int main()
   try
   {
     Message test;
-    test.set(Message::e_fields::enemy_count, 5);
-    test.set(Message::e_fields::msg_to_player, "hello from message out there heeey youu");
+    test.set<int32_t>(Message::e_fields::enemy_count, 5);
+    test.set<std::string>(Message::e_fields::msg_to_player, "hello from message out there heeey youu");
     auto s1 = msg::serde::ser(test);
 
     Message test2;

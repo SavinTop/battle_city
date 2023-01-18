@@ -46,10 +46,10 @@ namespace msg
                 if (!(temp_bitmap.test(0)))
                     continue;
                 auto &curr = m.list[i];
-                if (curr.type == field_type::int32)
-                    write<int32_t>(ss, std::get<int32_t>(curr.value));
+                if (curr.is_type<int32_t>())
+                    write<int32_t>(ss, curr.get<int32_t>());
                 else
-                    write<std::string>(ss, std::get<std::string>(curr.value));
+                    write<std::string>(ss, curr.get<std::string>());
             }
 
             return ss.str();
@@ -102,23 +102,46 @@ namespace msg
                     throw serde_error("the bitmap field gives the wrong data");
 
                 auto &curr = new_msg.list[i];
-                auto &exp_type = curr.type;
 
-                unsigned char type = read<int8_t>(ss);
+                msg::field_type type = static_cast<msg::field_type>(read<int8_t>(ss));
 
-                if (static_cast<int8_t>(exp_type) != type)
-                    throw serde_error("the type of the fields do not match");
+                if(type==msg::field_type::int32 && curr.is_type<int32_t>())
+                    curr.set(read<int32_t>(ss));
+                else if(type==msg::field_type::str && curr.is_type<std::string>())
+                    curr.set(read<std::string>(ss));
+                else throw serde_error("the type of the fields do not match");
 
-                if (exp_type == field_type::int32)
-                    curr.value = read<int32_t>(ss);
-                else
-                    curr.value = read<std::string>(ss);
-                
-                curr.active = true;
+                curr.set_active(true);
             }
 
             return new_msg;
         }
 
+    template <typename T>
+        size_t type_size(const T &) {
+        return pre_type_info + sizeof(T);
     }
+
+    template<>
+    size_t type_size<std::string>(const std::string& val) {
+        return pre_info_string+val.size();
+    }
+
+    template<>
+    size_t type_size<int32_t>(const int32_t& val) {
+        return pre_info_int32+sizeof(val);
+    }
+
+    template <>
+        bool fit_max_size<std::string>(const std::string & val) {
+        return val.size() <= UINT16_MAX;
+    }
+
+    template <>
+        bool fit_max_size<int32_t>(const int32_t & val) {
+        return true;
+    }
+
+    }
+
 } // namespace msg

@@ -9,11 +9,11 @@ TEST(Message, TestValues)
     auto msg_size = 8+8+1+4;
     Message test;
     const char test_str[] = {"Test message"};
-    test.set(Message::e_fields::msg_to_player, test_str); 
+    test.set<std::string>(Message::e_fields::msg_to_player, test_str); 
     EXPECT_STREQ(test_str, test.get<std::string>(Message::e_fields::msg_to_player).c_str());
     msg_size+=3+sizeof(test_str)-1;
     EXPECT_EQ(test.get<int32_t>(Message::e_fields::message_size), msg_size);
-    test.set(Message::e_fields::bullet_speed, 1337);
+    test.set<std::int32_t>(Message::e_fields::bullet_speed, 1337);
     EXPECT_EQ(test.get<int32_t>(Message::e_fields::bullet_speed), 1337);
     msg_size+=5;
     EXPECT_EQ(test.get<int32_t>(Message::e_fields::message_size), msg_size);
@@ -29,10 +29,10 @@ TEST(Message, SERDE)
 {
     Message test;
     const char test_str[] = {"Test message"};
-    test.set(Message::e_fields::msg_to_player, test_str);
-    test.set(Message::e_fields::name_of_main_block, test_str);
-    test.set(Message::e_fields::enemy_count, 1);
-    test.set(Message::e_fields::bullet_speed, 2);
+    test.set<std::string>(Message::e_fields::msg_to_player, test_str);
+    test.set<std::string>(Message::e_fields::name_of_main_block, test_str);
+    test.set<int32_t>(Message::e_fields::enemy_count, 1);
+    test.set<int32_t>(Message::e_fields::bullet_speed, 2);
     auto msg_size = 8+8+1+4 + (3+sizeof(test_str)-1)*2 + 5 + 5;
     EXPECT_EQ(test.get<int32_t>(Message::e_fields::message_size), msg_size);
     auto str = msg::serde::ser(test);
