@@ -10,8 +10,8 @@ include(${CMAKE_SOURCE_DIR}/conan/conanbuildinfo.cmake)
 conan_basic_setup()
 
 set(MESSAGE_SRC_LIST
-src/field_msg.cpp 
-src/serialization.cpp)
+src/msg/field_msg.cpp 
+src/msg/serde/serialization.cpp)
 
 add_library(message STATIC ${MESSAGE_SRC_LIST})
 target_include_directories(message PUBLIC include)

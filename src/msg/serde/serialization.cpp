@@ -1,7 +1,7 @@
-#include "serialization.h"
-#include "field_msg.h"
+#include "msg/serde/serialization.h"
+#include "msg/field_msg.h"
 #include <sstream>
-#include "msg_exceptions.h"
+#include "msg/exceptions/msg_exceptions.h"
 
 namespace msg
 {

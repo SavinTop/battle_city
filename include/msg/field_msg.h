@@ -4,7 +4,7 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
-#include <serialization.h>
+#include <msg/serde/serialization.h>
 #include <bitset>
 
 namespace msg
@@ -30,15 +30,14 @@ public:
     void set(e_fields, int);
     void del(e_fields);
     bool has(e_fields) const;
-    int get_int(e_fields) const;
-    const std::string &get_str(e_fields) const;
+    
+    template<typename T>
+    T get(e_fields) const;
 
 private:
-    size_t cast(e_fields) const;
-
-    bool is_constant(e_fields);
-
-    void throw_on_constant(e_fields);
+    static size_t cast(e_fields);
+    static bool is_constant(e_fields);
+    static void throw_on_constant(e_fields);
 
     uint64_t msg_size;
     std::bitset<64> msg_bitset;
@@ -51,6 +50,9 @@ private:
         field_type type;
         bool active;
         size_t size();
+        
+        template<typename T>
+        bool is_type();
     };
 
     template<size_t SIZE>
