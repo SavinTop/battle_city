@@ -67,7 +67,6 @@ namespace msg
 
     private:
         static size_t cast(e_fields);
-        static bool is_constant(e_fields);
         static void throw_on_constant(e_fields);
 
         uint64_t msg_size;

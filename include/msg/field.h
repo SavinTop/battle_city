@@ -30,7 +30,8 @@ namespace msg
             return m_active;
         }
 
-        void set_active(bool active){
+        void set_active(bool active)
+        {
             m_active = active;
         }
 
@@ -39,14 +40,16 @@ namespace msg
             return m_size;
         }
 
-        template<typename T>
-        void set(T value){
+        template <typename T>
+        void set(T value)
+        {
             m_value = value;
             m_size = serde::type_size<T>(std::get<T>(m_value));
         }
 
-        template<typename T>
-        T get() const{
+        template <typename T>
+        T get() const
+        {
             return std::get<T>(m_value);
         }
 
